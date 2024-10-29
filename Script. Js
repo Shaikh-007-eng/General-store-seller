@@ -1,0 +1,46 @@
+const apiUrl = 'https://crudcrud.com/api/fa43baf1d666436bb9f66be7e0555e8b/items';
+const itemForm = document.getElementById('itemForm');
+const itemsList = document.getElementById('itemsList');
+
+// Function to fetch and display items
+async function fetchItems() {
+    const response = await axios.get(apiUrl);
+    const items = response.data;
+
+    itemsList.innerHTML = ''; // Clear existing items
+    items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.name} - $${item.price}`;
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = () => deleteItem(item._id);
+        li.appendChild(deleteButton);
+        itemsList.appendChild(li);
+    });
+}
+
+// Function to add a new item
+async function addItem(event) {
+    event.preventDefault();
+    const itemName = document.getElementById('itemName').value;
+    const itemPrice = document.getElementById('itemPrice').value;
+
+    const item = {
+        name: itemName,
+        price: itemPrice,
+    };
+
+    await axios.post(apiUrl, item);
+    fetchItems(); // Refresh the item list
+    itemForm.reset(); // Clear the form fields
+}
+
+// Function to delete an item
+async function deleteItem(itemId) {
+    await axios.delete(`${apiUrl}/${itemId}`);
+    fetchItems(); // Refresh the item list
+}
+
+// Event listeners
+itemForm.addEventListener('submit', addItem);
+window.addEventListener('DOMContentLoaded', fetchItems);
